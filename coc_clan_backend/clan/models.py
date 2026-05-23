@@ -1,10 +1,11 @@
 from django.db import models
 
 class Member(models.Model):
+
     ROLE_CHOICES = [
         ('leader', 'Leader'),
-        ('co', 'Co-Leader'),
-        ('elder', 'Elder'),
+        ('coLeader', 'Co-Leader'),
+        ('admin', 'Elder'),
         ('member', 'Member'),
     ]
 
@@ -14,17 +15,55 @@ class Member(models.Model):
         ('inactive', 'Inactive'),
     ]
 
+    tag = models.CharField(max_length=30, unique=True)
+
     name = models.CharField(max_length=100)
-    tag = models.CharField(max_length=20, unique=True)
-    town_hall = models.IntegerField()
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES)
+
+    role = models.CharField(
+        max_length=20,
+        choices=ROLE_CHOICES
+    )
+
+    town_hall = models.IntegerField(default=1)
+
     trophies = models.IntegerField(default=0)
+
     donations = models.IntegerField(default=0)
+
     donations_received = models.IntegerField(default=0)
-    war_attacks_used = models.IntegerField(default=0)
-    performance = models.FloatField(default=0)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES)
-    last_active = models.DateTimeField(null=True, blank=True)
+
+    clan_rank = models.IntegerField(default=0)
+
+    exp_level = models.IntegerField(default=0)
+
+    league_name = models.CharField(
+        max_length=100,
+        blank=True
+    )
+
+    league_icon = models.URLField(blank=True)
+
+    # YOUR custom fields
+    missed_wars = models.IntegerField(default=0)
+
+    warning_level = models.CharField(
+        max_length=20,
+        default='low'
+    )
+
+    eligible_for_cwl = models.BooleanField(default=True)
+
+    leader_notes = models.TextField(blank=True)
+
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='active'
+    )
+
+    in_clan = models.BooleanField(default=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.name
