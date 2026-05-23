@@ -121,4 +121,39 @@ class Attack(models.Model):
     def __str__(self):
         return f"{self.member.name} - {self.stars}⭐"
 
+class Notice(models.Model):
+
+    NOTICE_TYPES = [
+        ('mail', 'Clan Mail'),
+        ('recruitment', 'Recruitment'),
+        ('war', 'War Reminder'),
+        ('cwl', 'CWL'),
+        ('promotion', 'Promotion'),
+    ]
+
+    STATUS_CHOICES = [
+        ('active', 'Active'),
+        ('archived', 'Archived'),
+    ]
+
+    title = models.CharField(max_length=200)
+
+    message = models.TextField()
+
+    notice_type = models.CharField(
+        max_length=30,
+        choices=NOTICE_TYPES
+    )
+
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='active'
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.title
+
         

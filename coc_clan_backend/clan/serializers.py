@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Member, War, Attack
+from .models import Member, War, Attack, Notice
 
 class MemberSerializer(serializers.ModelSerializer):
     class Meta:
@@ -20,4 +20,10 @@ class AttackSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Attack
+        fields = '__all__'
+
+
+class NoticeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Notice
         fields = '__all__'

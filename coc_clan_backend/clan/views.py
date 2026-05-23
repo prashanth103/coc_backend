@@ -5,8 +5,8 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from .models import Member, War, Attack
-from .serializers import MemberSerializer, WarSerializer, AttackSerializer
+from .models import Member, War, Attack, Notice
+from .serializers import MemberSerializer, WarSerializer, AttackSerializer, NoticeSerializer
 
 @api_view(['GET'])
 def members_list(request):
@@ -33,3 +33,13 @@ def attacks_list(request):
     serializer = AttackSerializer(attacks, many=True)
 
     return Response(serializer.data)
+
+@api_view(['GET'])
+def notices_list(request):
+
+    notices = Notice.objects.all().order_by('-created_at')
+
+    serializer = NoticeSerializer(notices, many=True)
+
+    return Response(serializer.data)
+
