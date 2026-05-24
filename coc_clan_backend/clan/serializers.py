@@ -13,8 +13,8 @@ class WarSerializer(serializers.ModelSerializer):
 
 class AttackSerializer(serializers.ModelSerializer):
 
-    member_name = serializers.CharField(
-        source='member.name',
+    attacker_name = serializers.CharField(
+        source='attacker.name',
         read_only=True
     )
 

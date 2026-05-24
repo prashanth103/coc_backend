@@ -87,15 +87,17 @@ class War(models.Model):
         ('pending', 'Pending'),
     ]
 
-    war_type = models.CharField(max_length=20, choices=WAR_TYPES)
+    # war_type = models.CharField(max_length=20, choices=WAR_TYPES)
+    war_type = models.CharField(max_length=50)
 
     enemy = models.CharField(max_length=100)
-    enemy_badge = models.CharField(max_length=20, unique=True)
+    enemy_badge = models.CharField(max_length=500, unique=True)
     enemy_level = models.IntegerField(default=1)
 
     size = models.IntegerField()
 
-    state = models.CharField(max_length=20, choices=WAR_STATES)
+    # state = models.CharField(max_length=20, choices=WAR_STATES)
+    state = models.CharField(max_length=50)
 
     our_stars = models.IntegerField(default=0)
     enemy_stars = models.IntegerField(default=0)
@@ -108,12 +110,13 @@ class War(models.Model):
 
     attacks_per_player = models.IntegerField(default=2)
 
-    result = models.CharField(
-        max_length=20,
-        choices=RESULT_TYPES,
-        default='pending'
-    )
-
+    # result = models.CharField(
+    #     max_length=20,
+    #     choices=RESULT_TYPES,
+    #     default='pending'
+    # )
+    result = models.CharField(max_length=50)
+    
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
 
@@ -124,42 +127,33 @@ class War(models.Model):
 
 class Attack(models.Model):
 
-    STAR_CHOICES = [
-        (0, '0 Star'),
-        (1, '1 Star'),
-        (2, '2 Star'),
-        (3, '3 Star'),
-    ]
-
     war = models.ForeignKey(
         War,
         on_delete=models.CASCADE,
         related_name='attacks'
     )
 
-    member = models.ForeignKey(
+    attacker = models.ForeignKey(
         Member,
         on_delete=models.CASCADE,
-        related_name='attacks'
+        related_name='attacks_made'
     )
 
-    target_base = models.IntegerField()
+    defender_tag = models.CharField(max_length=30)
 
-    stars = models.IntegerField(choices=STAR_CHOICES)
+    stars = models.IntegerField(default=0)
 
     destruction_percentage = models.FloatField(default=0)
 
-    attack_used = models.BooleanField(default=True)
+    attack_order = models.IntegerField(default=0)
 
-    attack_number = models.IntegerField(default=1)
-
-    war_type = models.CharField(max_length=20)
+    duration = models.IntegerField(default=0)
 
     attack_time = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.member.name} - {self.stars}⭐"
-
+        return f"{self.attacker.name} - {self.stars}⭐"
+        
 class Notice(models.Model):
 
     NOTICE_TYPES = [

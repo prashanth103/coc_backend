@@ -8,8 +8,10 @@ from rest_framework.response import Response
 from .models import Member, War, Attack, Notice
 from .serializers import MemberSerializer, WarSerializer, AttackSerializer, NoticeSerializer
 
-from .services.coc_service import get_clan_members
+from .services.coc_service import get_clan_members, get_current_war
 from .services.member_sync import sync_members
+from .services.war_sync import sync_current_war
+from .services.attack_sync import sync_attacks
 
 @api_view(['GET'])
 def members_list(request):
@@ -30,26 +32,86 @@ def sync_clan_members(request):
 
     return Response({
         "message": "Members synced successfully",
-        "total_members": len(clan_members)
+        "total_members": len(clan_members),
+        "clan_members": clan_members
     })
 
 @api_view(['GET'])
 def wars_list(request):
-    wars = War.objects.all().order_by('-created_at')
+    # wars = War.objects.all().order_by('-created_at')
+    wars = War.objects.order_by(
+         '-start_time'
+    )[:10]
 
     serializer = WarSerializer(wars, many=True)
 
     return Response(serializer.data)
 
 @api_view(['GET'])
-def attacks_list(request):
+def current_war(request):
 
-    attacks = Attack.objects.select_related(
-        'member',
-        'war'
-    ).order_by('-attack_time')
+    clan_tag = "#2Y2VGRQCY"
 
-    serializer = AttackSerializer(attacks, many=True)
+    data = get_current_war(clan_tag)
+
+    return Response(data)
+
+@api_view(['GET'])
+def sync_current_war_api(request):
+
+    clan_tag = "#2Y2VGRQCY"
+    
+    data = get_current_war(clan_tag)
+
+    if data.get('reason') == 'notInWar':
+        return Response({
+            "message": "Clan is not currently in war"
+        })
+    war = sync_current_war(data)
+
+    sync_attacks(war, data)
+
+    return Response({
+        "message": "Current war synced successfully",
+        "war_data": data
+    })
+
+@api_view(['GET'])
+def current_war_attacks(request):
+
+    current_war = War.objects.order_by(
+        '-start_time'
+    ).first()
+
+    if not current_war:
+        return Response([])
+
+    attacks = Attack.objects.filter(
+        war=current_war
+    ).select_related(
+        'attacker'
+    ).order_by('-attack_order')
+
+    serializer = AttackSerializer(
+        attacks,
+        many=True
+    )
+
+    return Response(serializer.data)
+
+@api_view(['GET'])
+def attacks_by_war(request, war_id):
+
+    attacks = Attack.objects.filter(
+        war_id=war_id
+    ).select_related(
+        'attacker'
+    ).order_by('-attack_order')
+
+    serializer = AttackSerializer(
+        attacks,
+        many=True
+    )
 
     return Response(serializer.data)
 

@@ -20,3 +20,14 @@ def get_clan_members(clan_tag):
     response = requests.get(url, headers=headers)
 
     return response.json()
+
+def get_current_war(clan_tag):
+
+    encoded_tag = clan_tag.replace("#", "%23")
+
+    url = f"{BASE_URL}/clans/{encoded_tag}/currentwar"
+
+    response = requests.get(url, headers=headers)
+
+    return response.json()
+
