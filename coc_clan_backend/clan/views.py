@@ -40,6 +40,34 @@ def sync_clan_members(request):
     })
 
 @api_view(['GET'])
+def current_members_list(request):
+
+    members = Member.objects.filter(
+        in_clan=True
+    ).order_by('clan_rank')
+
+    serializer = MemberSerializer(
+        members,
+        many=True
+    )
+
+    return Response(serializer.data)
+
+@api_view(['GET'])
+def left_members_list(request):
+
+    members = Member.objects.filter(
+        in_clan=False
+    ).order_by('-created_at')
+
+    serializer = MemberSerializer(
+        members,
+        many=True
+    )
+
+    return Response(serializer.data)
+
+@api_view(['GET'])
 def wars_list(request):
     # wars = War.objects.all().order_by('-created_at')
     wars = War.objects.order_by(
