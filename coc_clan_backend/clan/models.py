@@ -76,8 +76,8 @@ class War(models.Model):
 
     WAR_STATES = [
         ('preparation', 'Preparation'),
-        ('in_battle', 'In Battle'),
-        ('war_ended', 'War Ended'),
+        ('inWar', 'In War'),
+        ('warEnded', 'War Ended'),
     ]
 
     RESULT_TYPES = [
@@ -96,8 +96,8 @@ class War(models.Model):
 
     size = models.IntegerField()
 
-    # state = models.CharField(max_length=20, choices=WAR_STATES)
-    state = models.CharField(max_length=50)
+    state = models.CharField(max_length=20, choices=WAR_STATES)
+    # state = models.CharField(max_length=50)
 
     our_stars = models.IntegerField(default=0)
     enemy_stars = models.IntegerField(default=0)
@@ -110,17 +110,22 @@ class War(models.Model):
 
     attacks_per_player = models.IntegerField(default=2)
 
-    # result = models.CharField(
-    #     max_length=20,
-    #     choices=RESULT_TYPES,
-    #     default='pending'
-    # )
-    result = models.CharField(max_length=50)
+    result = models.CharField(
+        max_length=20,
+        choices=RESULT_TYPES,
+        default='pending'
+    )
+    # result = models.CharField(max_length=50)
     
-    start_time = models.DateTimeField()
+    start_time = models.DateTimeField(unique=True)
     end_time = models.DateTimeField()
 
     created_at = models.DateTimeField(auto_now_add=True)
+
+    raw_data = models.JSONField(
+        default=dict,
+        blank=True
+    )
 
     def __str__(self):
         return f"{self.war_type} vs {self.enemy}"

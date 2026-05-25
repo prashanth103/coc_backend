@@ -93,6 +93,7 @@ def sync_current_war(data):
             'end_time': parse_coc_time(
                 data['endTime']
             ),
+            'raw_data': data,
         }
     )
 

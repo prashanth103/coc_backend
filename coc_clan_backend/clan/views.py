@@ -12,6 +12,9 @@ from .services.coc_service import get_clan_members, get_current_war
 from .services.member_sync import sync_members
 from .services.war_sync import sync_current_war
 from .services.attack_sync import sync_attacks
+from .services.attack_analytics import (
+    build_attack_summary
+)
 
 @api_view(['GET'])
 def members_list(request):
@@ -76,6 +79,46 @@ def sync_current_war_api(request):
         "war_data": data
     })
 
+# @api_view(['GET'])
+# def current_war_attacks(request):
+
+#     current_war = War.objects.order_by(
+#         '-start_time'
+#     ).first()
+
+#     if not current_war:
+#         return Response([])
+
+#     attacks = Attack.objects.filter(
+#         war=current_war
+#     ).select_related(
+#         'attacker'
+#     ).order_by('-attack_order')
+
+#     serializer = AttackSerializer(
+#         attacks,
+#         many=True
+#     )
+
+#     return Response(serializer.data)
+
+# @api_view(['GET'])
+# def attacks_by_war(request, war_id):
+
+#     attacks = Attack.objects.filter(
+#         war_id=war_id
+#     ).select_related(
+#         'attacker'
+#     ).order_by('-attack_order')
+
+#     serializer = AttackSerializer(
+#         attacks,
+#         many=True
+#     )
+
+#     return Response(serializer.data)
+
+
 @api_view(['GET'])
 def current_war_attacks(request):
 
@@ -84,36 +127,59 @@ def current_war_attacks(request):
     ).first()
 
     if not current_war:
-        return Response([])
 
-    attacks = Attack.objects.filter(
-        war=current_war
-    ).select_related(
-        'attacker'
-    ).order_by('-attack_order')
+        return Response({
+            'message': 'No active war found',
+            'attacks': []
+        })
 
-    serializer = AttackSerializer(
-        attacks,
-        many=True
+    if current_war.state == 'preparation':
+
+        return Response({
+            'message': 'War is in preparation phase. No attacks yet.',
+            'state': current_war.state,
+            'attacks': []
+        })
+
+    data = build_attack_summary(
+        current_war
     )
 
-    return Response(serializer.data)
+    return Response({
+        'state': current_war.state,
+        'attacks': data
+    })
 
 @api_view(['GET'])
 def attacks_by_war(request, war_id):
 
-    attacks = Attack.objects.filter(
-        war_id=war_id
-    ).select_related(
-        'attacker'
-    ).order_by('-attack_order')
+    try:
+        war = War.objects.get(id=war_id)
 
-    serializer = AttackSerializer(
-        attacks,
-        many=True
+    except War.DoesNotExist:
+
+        return Response({
+            'message': 'War not found',
+            'attacks': []
+        })
+
+    if war.state == 'preparation':
+
+        return Response({
+            'message': 'War is in preparation phase. No attacks yet.',
+            'state': war.state,
+            'attacks': []
+        })
+
+    data = build_attack_summary(
+        war
     )
 
-    return Response(serializer.data)
+    return Response({
+        'state': war.state,
+        'attacks': data
+    })
+
 
 @api_view(['GET'])
 def notices_list(request):
