@@ -8,13 +8,54 @@ from rest_framework.response import Response
 from .models import Member, War, Attack, Notice
 from .serializers import MemberSerializer, WarSerializer, AttackSerializer, NoticeSerializer
 
-from .services.coc_service import get_clan_members, get_current_war
+from .services.coc_service import get_clan_members, get_current_war, get_clan_details
 from .services.member_sync import sync_members
 from .services.war_sync import sync_current_war
 from .services.attack_sync import sync_attacks
 from .services.attack_analytics import (
     build_attack_summary
 )
+
+@api_view(['GET'])
+def clan_details(request):
+
+    clan_tag = "#2Y2VGRQCY"
+
+    data = get_clan_details(
+        clan_tag
+    )
+
+    return Response({
+        'tag': data.get('tag'),
+        'name': data.get('name'),
+        'description': data.get('description'),
+        'badge': data.get('badgeUrls', {}).get('large'),
+        'clan_level': data.get('clanLevel'),
+        'location': data.get(
+            'location',
+            {}
+        ).get('name'),
+        'members': data.get('members'),
+        'required_trophies': data.get(
+            'requiredTrophies'
+        ),
+        'war_frequency': data.get(
+            'warFrequency'
+        ),
+        'war_wins': data.get('warWins'),
+        'war_losses': data.get('warLosses'),
+        'war_ties': data.get('warTies'),
+        'war_win_streak': data.get(
+            'warWinStreak'
+        ),
+        'war_league': data.get(
+            'warLeague',
+            {}
+        ).get('name'),
+        'clan_points': data.get(
+            'clanPoints'
+        ),
+    })
 
 @api_view(['GET'])
 def members_list(request):

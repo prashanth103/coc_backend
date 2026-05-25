@@ -12,9 +12,11 @@ from .views import (
     sync_current_war_api,
     current_members_list,
     left_members_list,
+    clan_details
 )
 
 urlpatterns = [
+    path('clan/', clan_details),
     path('members/', members_list),
     path('sync-members/', sync_clan_members),
     path(
